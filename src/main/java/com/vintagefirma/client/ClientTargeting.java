@@ -1,6 +1,7 @@
 package com.vintagefirma.client;
 
 import com.vintagefirma.common.AnvilHandler;
+import com.vintagefirma.common.RockVoxel;
 import com.vintagefirma.common.VoxelRaycast;
 import com.vintagefirma.smithing.Voxels;
 import java.util.Map;
@@ -25,6 +26,11 @@ public final class ClientTargeting
 
     /** A targeted clay column (x, z); the server stacks clay from the bottom of that column up. */
     public record ClayColumn(BlockPos pos, int x, int z)
+    {
+    }
+
+    /** A targeted stone voxel to chip off. */
+    public record RockTarget(BlockPos pos, int x, int y, int z)
     {
     }
 
@@ -141,6 +147,35 @@ public final class ClientTargeting
                 best = new ClayColumn(pos, gx, gz);
             }
         }
+        return best;
+    }
+
+    @Nullable
+    public static RockTarget findRockTarget(Player player)
+    {
+        final Minecraft minecraft = Minecraft.getInstance();
+        if (minecraft.level == null) return null;
+
+        final double reach = Math.max(3.0, player.getAttributeValue(ForgeMod.BLOCK_REACH.get()));
+
+        RockTarget best = null;
+        double bestDistance = Double.MAX_VALUE;
+        for (Map.Entry<BlockPos, ClientRockCache.RockWork> entry : ClientRockCache.map().entrySet())
+        {
+            final BlockPos pos = entry.getKey();
+            if (player.distanceToSqr(Vec3.atCenterOf(pos)) > (reach + 1.5) * (reach + 1.5)) continue;
+            if (!minecraft.level.isLoaded(pos)) continue;
+
+            // The stone blank rests directly on top of the support block and is drawn 1.5x larger.
+            final RockVoxel.Hit hit = RockVoxel.raycast(minecraft.level, player, pos,
+                entry.getValue().voxels());
+            if (hit != null && hit.distanceSqr() < bestDistance)
+            {
+                bestDistance = hit.distanceSqr();
+                best = new RockTarget(pos, hit.x(), hit.y(), hit.z());
+            }
+        }
+
         return best;
     }
 

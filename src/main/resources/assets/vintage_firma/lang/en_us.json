@@ -56,7 +56,7 @@
 
   "vintage_firma.screen.select_recipe": "Select a smithing recipe",
   "vintage_firma.screen.recipe_hint": "Shift + right click with an ingot or a sheet to start",
-  "vintage_firma.screen.recipe_info": "%s voxels, %s ingots",
+  "vintage_firma.screen.recipe_info": "%s ingots",
 
   "vintage_firma.command.cannot_heat": "That item cannot be heated",
   "vintage_firma.command.heated": "%s is now at %s °C",
@@ -71,11 +71,17 @@
 
   "vintage_firma.screen.select_clay": "Select a clay recipe",
   "vintage_firma.screen.clay_hint": "Shift + right click a block with clay in hand to start",
-  "vintage_firma.screen.clay_info": "%s voxels, ~%s clay",
+  "vintage_firma.screen.clay_info": "~%s clay",
 
   "vintage_firma.message.clay_started": "Started shaping: %s",
   "vintage_firma.message.clay_completed": "Finished: %s",
   "vintage_firma.message.clay_need_clay": "You need clay in your hand",
   "vintage_firma.message.clay_need_surface": "Clay needs a solid surface to rest on",
-  "vintage_firma.message.clay_no_recipe": "There are no clay recipes"
+  "vintage_firma.message.clay_no_recipe": "There are no clay recipes",
+
+  "vintage_firma.screen.select_rock": "Select a stone tool to knap",
+  "vintage_firma.screen.rock_hint": "Shift + right click a loose rock on the ground",
+  "vintage_firma.screen.rock_info": "%s voxels",
+
+  "vintage_firma.message.rock_protected": "Sneak + break to remove the piece"
 }

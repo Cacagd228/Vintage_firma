@@ -1,0 +1,19 @@
+{
+  "type": "vintage_firma:clay_forming",
+  "ingredient": {
+    "item": "tfc:fire_clay"
+  },
+  "pattern": [
+    [
+      "XXXX",
+      "X  X",
+      "X  X",
+      "X  X",
+      "XXXX"
+    ]
+  ],
+  "result": {
+    "item": "tfc:ceramic/unfired_fire_ingot_mold"
+  },
+  "voxels_per_clay": 25
+}

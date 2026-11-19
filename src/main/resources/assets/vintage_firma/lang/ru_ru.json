@@ -56,7 +56,7 @@
 
   "vintage_firma.screen.select_recipe": "Выберите рецепт ковки",
   "vintage_firma.screen.recipe_hint": "Shift + ПКМ со слитком или пластиной, чтобы начать",
-  "vintage_firma.screen.recipe_info": "%s вокселей, %s слитка(-ов)",
+  "vintage_firma.screen.recipe_info": "%s слитка(-ов)",
 
   "vintage_firma.command.cannot_heat": "Этот предмет нельзя нагреть",
   "vintage_firma.command.heated": "%s теперь при %s °C",
@@ -71,11 +71,17 @@
 
   "vintage_firma.screen.select_clay": "Выберите изделие из глины",
   "vintage_firma.screen.clay_hint": "Shift + ПКМ по блоку с глиной в руке, чтобы начать",
-  "vintage_firma.screen.clay_info": "%s вокселей, ~%s глины",
+  "vintage_firma.screen.clay_info": "~%s глины",
 
   "vintage_firma.message.clay_started": "Начата лепка: %s",
   "vintage_firma.message.clay_completed": "Готово: %s",
   "vintage_firma.message.clay_need_clay": "Нужна глина в руке",
   "vintage_firma.message.clay_need_surface": "Для глины нужна твёрдая поверхность",
-  "vintage_firma.message.clay_no_recipe": "Нет рецептов лепки"
+  "vintage_firma.message.clay_no_recipe": "Нет рецептов лепки",
+
+  "vintage_firma.screen.select_rock": "Выберите каменное орудие",
+  "vintage_firma.screen.rock_hint": "Shift + ПКМ по камешку на земле",
+  "vintage_firma.screen.rock_info": "%s вокселей",
+
+  "vintage_firma.message.rock_protected": "Shift+ЛКМ, чтобы убрать заготовку"
 }

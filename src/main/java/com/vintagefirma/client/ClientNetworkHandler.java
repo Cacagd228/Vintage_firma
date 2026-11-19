@@ -1,8 +1,10 @@
 package com.vintagefirma.client;
 
 import com.vintagefirma.network.S2COpenClaySelectionPacket;
+import com.vintagefirma.network.S2COpenRockSelectionPacket;
 import com.vintagefirma.network.S2COpenSelectionPacket;
 import com.vintagefirma.network.S2CSyncClayPacket;
+import com.vintagefirma.network.S2CSyncRockPacket;
 import com.vintagefirma.network.S2CSyncWorkPacket;
 import net.minecraft.client.Minecraft;
 
@@ -49,5 +51,23 @@ public final class ClientNetworkHandler
     public static void handleOpenClaySelection(S2COpenClaySelectionPacket packet)
     {
         Minecraft.getInstance().setScreen(new ClaySelectScreen(packet.pos(), packet.entries()));
+    }
+
+    public static void handleRockSync(S2CSyncRockPacket packet)
+    {
+        if (packet.present())
+        {
+            ClientRockCache.put(packet.pos(),
+                new ClientRockCache.RockWork(packet.voxels(), packet.recipe()));
+        }
+        else
+        {
+            ClientRockCache.remove(packet.pos());
+        }
+    }
+
+    public static void handleOpenRockSelection(S2COpenRockSelectionPacket packet)
+    {
+        Minecraft.getInstance().setScreen(new RockSelectScreen(packet.pos(), packet.entries()));
     }
 }

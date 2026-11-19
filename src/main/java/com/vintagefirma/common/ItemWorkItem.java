@@ -43,8 +43,6 @@ public class ItemWorkItem extends Item
 
         tooltip.add(Component.translatable("vintage_firma.tooltip.metal", metalName(data.metal()))
             .withStyle(ChatFormatting.GRAY));
-        tooltip.add(Component.translatable("vintage_firma.tooltip.voxels", data.voxelCount(),
-            data.totalPieces()).withStyle(ChatFormatting.DARK_GRAY));
 
         // How the work item is doing: the strike count and how often it cooled down, both of which decide
         // the quality of the finished item (TFC's forging bonus).

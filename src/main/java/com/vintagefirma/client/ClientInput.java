@@ -4,10 +4,14 @@ import com.vintagefirma.VintageFirma;
 import com.vintagefirma.common.AnvilHandler;
 import com.vintagefirma.common.ClayHandler;
 import com.vintagefirma.common.HammerMode;
+import com.vintagefirma.common.RockHandler;
 import com.vintagefirma.network.C2SAnvilInteractPacket;
 import com.vintagefirma.network.C2SClayInteractPacket;
 import com.vintagefirma.network.C2SClaySculptPacket;
 import com.vintagefirma.network.C2SHammerHitPacket;
+import com.vintagefirma.network.C2SRockChipPacket;
+import com.vintagefirma.network.C2SRockInteractPacket;
+import com.vintagefirma.network.C2SRockRemovePacket;
 import com.vintagefirma.network.C2SSetHammerModePacket;
 import com.vintagefirma.network.VFNetwork;
 import com.mojang.blaze3d.platform.InputConstants;
@@ -70,6 +74,21 @@ public final class ClientInput
             }
         }
 
+        // Rock knapping: while holding a loose rock, left click only chips the aimed stone voxel and
+        // never breaks a block (so holding attack after the piece is finished cannot destroy the support).
+        if (RockHandler.isLooseRock(player.getMainHandItem()) && event.isAttack())
+        {
+            event.setCanceled(true);
+            final ClientTargeting.RockTarget rockTarget = ClientTargeting.findRockTarget(player);
+            if (rockTarget != null)
+            {
+                player.swing(InteractionHand.MAIN_HAND);
+                VFNetwork.sendToServer(
+                    new C2SRockChipPacket(rockTarget.pos(), rockTarget.x(), rockTarget.z()));
+            }
+            return;
+        }
+
         if (event.isAttack())
         {
             attackHeld = true;
@@ -87,6 +106,37 @@ public final class ClientInput
 
         if (event.isUseItem())
         {
+            // Rock knapping (Shift + right click with a loose rock):
+            //  - aim at the stone piece    -> remove it (nothing drops)
+            //  - aim at a loose rock block -> open the "what to knap" menu
+            //  - aim at the support block  -> remove the piece on top of it
+            if (player.isShiftKeyDown() && RockHandler.isLooseRock(player.getMainHandItem()))
+            {
+                final ClientTargeting.RockTarget rockTarget = ClientTargeting.findRockTarget(player);
+                if (rockTarget != null)
+                {
+                    event.setCanceled(true);
+                    VFNetwork.sendToServer(new C2SRockRemovePacket(rockTarget.pos()));
+                    return;
+                }
+                if (minecraft.hitResult instanceof net.minecraft.world.phys.BlockHitResult rockHit)
+                {
+                    if (RockHandler.isLooseRockBlock(minecraft.level.getBlockState(rockHit.getBlockPos())))
+                    {
+                        event.setCanceled(true);
+                        VFNetwork.sendToServer(new C2SRockInteractPacket(rockHit.getBlockPos()));
+                        return;
+                    }
+                    if (ClientRockCache.has(rockHit.getBlockPos().above()))
+                    {
+                        event.setCanceled(true);
+                        VFNetwork.sendToServer(new C2SRockRemovePacket(rockHit.getBlockPos().above()));
+                        return;
+                    }
+                }
+                // Not aiming at anything rock-related: let vanilla handle it.
+            }
+
             // Clay forming: right click a block while holding clay opens the "what to shape" menu.
             // This runs before the vanilla item use, so it also cancels TFC's clay knapping on that click.
             if (ClayHandler.isClay(player.getMainHandItem())
@@ -183,6 +233,7 @@ public final class ClientInput
         {
             ClientWorkCache.clear();
             ClientClayCache.clear();
+            ClientRockCache.clear();
             reset();
         }
     }

@@ -9,11 +9,9 @@ import com.vintagefirma.smithing.Voxels;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -83,7 +81,23 @@ public final class ClayHandler
         if (id == null || !id.getNamespace().equals("tfc")) return false;
 
         final String path = id.getPath();
-        return path.startsWith("clay/") || path.startsWith("clay_grass/");
+        return path.startsWith("clay/") || path.startsWith("clay_grass/") || path.equals("fire_clay");
+    }
+
+    /** @return {@code true} if the stack is fire clay (used for crucibles / fire bricks). */
+    public static boolean isFireClay(ItemStack stack)
+    {
+        if (stack.isEmpty()) return false;
+        final ResourceLocation id = ForgeRegistries.ITEMS.getKey(stack.getItem());
+        return id != null && id.getNamespace().equals("tfc") && id.getPath().equals("fire_clay");
+    }
+
+    @Nullable
+    private static ItemStack heldClay(ServerPlayer player)
+    {
+        if (isClay(player.getMainHandItem())) return player.getMainHandItem();
+        if (isClay(player.getOffhandItem())) return player.getOffhandItem();
+        return null;
     }
 
     /** Takes one clay item from the main hand or the offhand. */
@@ -193,6 +207,9 @@ public final class ClayHandler
         VintageFirma.LOGGER.info("[clay] sculpt add={} col=({},{}) layer={} clay={}", add, x, z, layer, work.clay());
         if (layer >= Voxels.SIZE_Y) return; // the piece already matches
 
+        // Rate limit: 0.3 s between actions (shared with the hammer and stone chipping).
+        if (!Cooldowns.ready(player.getUUID())) return;
+
         if (add)
         {
             if (Voxels.get(voxels, x, layer, z) != Voxels.EMPTY) return;
@@ -216,6 +233,8 @@ public final class ClayHandler
             broadcast(level, pos);
 
             level.playSound(null, pos, SoundEvents.DECORATED_POT_PLACE, SoundSource.BLOCKS, 0.5f, 1.3f);
+            Cooldowns.trigger(player.getUUID());
+            player.getCooldowns().addCooldown(player.getMainHandItem().getItem(), Cooldowns.ACTION_TICKS);
             checkComplete(player, level, pos, newWork, recipe);
             return;
         }
@@ -230,6 +249,8 @@ public final class ClayHandler
         broadcast(level, pos);
 
         level.playSound(null, pos, SoundEvents.DECORATED_POT_HIT, SoundSource.BLOCKS, 0.4f, 1.2f);
+        Cooldowns.trigger(player.getUUID());
+        player.getCooldowns().addCooldown(player.getMainHandItem().getItem(), Cooldowns.ACTION_TICKS);
         checkComplete(player, level, pos, newWork, recipe);
     }
 
@@ -277,8 +298,8 @@ public final class ClayHandler
 
     public static void message(Player player, String key, Object... args)
     {
-        player.displayClientMessage(Component.translatable("vintage_firma.message." + key, args)
-            .withStyle(ChatFormatting.GRAY), true);
+        // Clay action-bar messages are intentionally disabled (per user request).
+        // Clay forming gives feedback through sound and the world visuals instead.
     }
 
     // ---------------------------------------------------------------------------------------------
@@ -341,7 +362,25 @@ public final class ClayHandler
             return;
         }
 
-        final List<ClayRecipe> recipes = clayRecipes(level);
+        final ItemStack held = heldClay(player);
+        if (held == null) return;
+        final boolean heldFire = isFireClay(held);
+
+        // Only show recipes for the kind of clay in hand: fire clay -> fire-clay items (crucible, ...),
+        // regular clay -> everything else.
+        final var fireClayItem = ForgeRegistries.ITEMS.getValue(new ResourceLocation("tfc", "fire_clay"));
+        final ItemStack fireClayStack = fireClayItem != null ? new ItemStack(fireClayItem) : ItemStack.EMPTY;
+
+        final List<ClayRecipe> recipes = new ArrayList<>();
+        for (ClayRecipe recipe : clayRecipes(level))
+        {
+            final boolean recipeFire = !fireClayStack.isEmpty() && recipe.getIngredient().test(fireClayStack);
+            if (recipeFire == heldFire)
+            {
+                recipes.add(recipe);
+            }
+        }
+
         VintageFirma.LOGGER.info("[clay] clay recipes available: {}", recipes.size());
         if (recipes.isEmpty())
         {

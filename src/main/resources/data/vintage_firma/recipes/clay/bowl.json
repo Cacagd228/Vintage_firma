@@ -1,10 +1,26 @@
 {
   "type": "vintage_firma:clay_forming",
-  "ingredient": { "tag": "tfc:clay" },
+  "ingredient": {
+    "tag": "tfc:clay"
+  },
   "pattern": [
-    [".###.", "#####", "#####", "#####", ".###."],
-    ["#...#", "#...#", "#...#", "#...#", "#...#"]
+    [
+      "####",
+      "####",
+      "####",
+      "####"
+    ],
+    [
+      ".####.",
+      "#....#",
+      "#....#",
+      "#....#",
+      "#....#",
+      ".####."
+    ]
   ],
-  "result": { "item": "tfc:ceramic/unfired_bowl" },
+  "result": {
+    "item": "tfc:ceramic/unfired_bowl"
+  },
   "voxels_per_clay": 25
 }

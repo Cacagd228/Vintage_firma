@@ -32,3 +32,6 @@ build_compile.log
 
 # dependency jars (TerraFirmaCraft / Patchouli) - not committed, see libs/README.md
 libs/
+
+# local agent notes
+agents.md

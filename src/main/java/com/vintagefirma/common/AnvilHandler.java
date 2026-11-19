@@ -58,8 +58,6 @@ public final class AnvilHandler
     public static final ResourceLocation WROUGHT_IRON_ANVIL = new ResourceLocation("tfc", "metal/anvil/wrought_iron");
 
     private static final Map<UUID, HammerMode> MODES = new HashMap<>();
-    private static final Map<UUID, Integer> HIT_COOLDOWN = new HashMap<>();
-    private static final int HIT_COOLDOWN_TICKS = 5;
 
     /** Anvil slot 0 is the main input, slot 1 the second one. */
     private static final int SLOT_INPUT = AnvilBlockEntity.SLOT_INPUT_MAIN;
@@ -323,8 +321,7 @@ public final class AnvilHandler
         if (data == null) return;
         if (!player.getMainHandItem().is(TFCTags.Items.HAMMERS)) return;
 
-        final int cooldown = HIT_COOLDOWN.getOrDefault(player.getUUID(), 0);
-        if (cooldown > 0) return;
+        if (!Cooldowns.ready(player.getUUID())) return;
 
         if (!Voxels.inBounds(x, y, z) || Voxels.get(data.voxels(), x, y, z) == Voxels.EMPTY) return;
 
@@ -343,7 +340,8 @@ public final class AnvilHandler
             return;
         }
 
-        HIT_COOLDOWN.put(player.getUUID(), HIT_COOLDOWN_TICKS);
+        Cooldowns.trigger(player.getUUID());
+        player.getCooldowns().addCooldown(player.getMainHandItem().getItem(), Cooldowns.ACTION_TICKS);
 
         // A strike after the work item cooled down counts as a cooling event, and the strike itself counts
         // as one step towards the work (TFC's forging bonus is based on the strike-to-optimum ratio).
@@ -822,8 +820,7 @@ public final class AnvilHandler
     {
         if (event.phase != TickEvent.Phase.END) return;
 
-        HIT_COOLDOWN.replaceAll((uuid, ticks) -> ticks - 1);
-        HIT_COOLDOWN.values().removeIf(ticks -> ticks <= 0);
+        Cooldowns.tick();
 
         final MinecraftServer server = net.minecraftforge.server.ServerLifecycleHooks.getCurrentServer();
         if (server != null)
@@ -839,6 +836,6 @@ public final class AnvilHandler
     public static void onPlayerLogout(net.minecraftforge.event.entity.player.PlayerEvent.PlayerLoggedOutEvent event)
     {
         MODES.remove(event.getEntity().getUUID());
-        HIT_COOLDOWN.remove(event.getEntity().getUUID());
+        Cooldowns.clear(event.getEntity().getUUID());
     }
 }

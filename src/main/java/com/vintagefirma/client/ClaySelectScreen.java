@@ -113,7 +113,7 @@ public class ClaySelectScreen extends Screen
             graphics.renderItem(entry.result(), getX() + 3, getY() + 3);
             graphics.drawString(font, entry.result().getHoverName(), getX() + 24, getY() + 3, 0xFFFFFFFF, false);
             graphics.drawString(font,
-                Component.translatable("vintage_firma.screen.clay_info", entry.voxels(), entry.clay()),
+                Component.translatable("vintage_firma.screen.clay_info", entry.clay()),
                 getX() + 24, getY() + 12, 0xFFAAAAAA, false);
         }
     }

@@ -1,0 +1,19 @@
+{
+  "type": "vintage_firma:clay_forming",
+  "ingredient": {
+    "item": "tfc:fire_clay"
+  },
+  "pattern": [
+    [
+      "XXXXX",
+      "     ",
+      "XXXXX",
+      "     ",
+      "XXXXX"
+    ]
+  ],
+  "result": {
+    "item": "tfc:ceramic/unfired_fire_brick"
+  },
+  "voxels_per_clay": 25
+}

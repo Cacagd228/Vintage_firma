@@ -86,6 +86,7 @@
     <div class="row" id="metalRow"><label>металл</label><select id="metal"></select></div>
     <div class="row" id="tierRow"><label>tier наковальни</label><input type="number" id="tier" value="3" min="1" max="6"></div>
     <div class="row" id="itemRow"><label>предмет</label><select id="item"></select></div>
+    <div class="row" id="clayTemplateRow" style="display:none"><label>шаблон</label><select id="clayTemplate"></select></div>
     <div class="row" id="clayItemRow" style="display:none"><label>изделие</label><select id="clayItem"></select></div>
     <div class="row" id="floorRow"><label>pattern_floor</label><input type="number" id="floor" value="0" min="0" max="5"></div>
     <div class="row" id="optimalRow"><label>optimal_hits</label><input type="number" id="optimal" value="-1" min="-1"></div>
@@ -128,6 +129,7 @@ const toastEl = document.getElementById("toast");
 const metalSel = document.getElementById("metal");
 const itemSel = document.getElementById("item");
 const clayItemSel = document.getElementById("clayItem");
+const clayTemplateSel = document.getElementById("clayTemplate");
 const modeSel = document.getElementById("mode");
 const tierInput = document.getElementById("tier");
 const floorInput = document.getElementById("floor");
@@ -142,6 +144,7 @@ const metalRow = document.getElementById("metalRow");
 const tierRow = document.getElementById("tierRow");
 const itemRow = document.getElementById("itemRow");
 const clayItemRow = document.getElementById("clayItemRow");
+const clayTemplateRow = document.getElementById("clayTemplateRow");
 const floorRow = document.getElementById("floorRow");
 const optimalRow = document.getElementById("optimalRow");
 const perClayRow = document.getElementById("perClayRow");
@@ -185,15 +188,69 @@ const PARTS = {
     shield: "metal/shield",
 };
 
-// Unfired TFC pottery that clay forming can produce (full item ids, no metal suffix).
+// TFC clay/fire-clay knapping recipes (5x5) offered as ready templates in the clay mode.
+const CLAY_TEMPLATES = [
+  {n:"axe_head_mold", r:"tfc:ceramic/unfired_axe_head_mold", p:["X XXX","    X","     ","    X","X XXX"]},
+  {n:"bell_mold", r:"tfc:ceramic/unfired_bell_mold", p:["XXXXX","XX XX","X   X","X   X","X   X"]},
+  {n:"blowpipe", r:"tfc:ceramic/unfired_blowpipe", p:[" X X "," X X "," XXX "," XXX "," XXX "]},
+  {n:"bowl_2", r:"tfc:ceramic/unfired_bowl", p:["X   X"," XXX "]},
+  {n:"bowl_4", r:"tfc:ceramic/unfired_bowl", p:["X   X"," XXX ","     ","X   X"," XXX "]},
+  {n:"brick", r:"tfc:ceramic/unfired_brick", p:["XXXXX","     ","XXXXX","     ","XXXXX"]},
+  {n:"chisel_head_mold", r:"tfc:ceramic/unfired_chisel_head_mold", p:["XX XX","XX XX","XX XX","XX XX","XX XX"]},
+  {n:"flower_pot", r:"tfc:ceramic/unfired_flower_pot", p:[" X X "," XXX ","     "," X X "," XXX "]},
+  {n:"hammer_head_mold", r:"tfc:ceramic/unfired_hammer_head_mold", p:["XXXXX","     ","     ","XX XX","XXXXX"]},
+  {n:"hoe_head_mold", r:"tfc:ceramic/unfired_hoe_head_mold", p:["XXXXX","     ","  XXX","XXXXX"]},
+  {n:"ingot_mold", r:"tfc:ceramic/unfired_ingot_mold", p:["XXXX","X  X","X  X","X  X","XXXX"]},
+  {n:"javelin_head_mold", r:"tfc:ceramic/unfired_javelin_head_mold", p:["   XX","    X","     ","X   X","XX XX"]},
+  {n:"jug", r:"tfc:ceramic/unfired_jug", p:[" X   ","XXXX ","XXX X","XXXX ","XXX  "]},
+  {n:"knife_blade_mold", r:"tfc:ceramic/unfired_knife_blade_mold", p:["XX X","X  X","X  X","X  X","X  X"]},
+  {n:"large_vessel", r:"tfc:ceramic/unfired_large_vessel", p:["X   X","X   X","X   X","X   X","XXXXX"]},
+  {n:"mace_blade_mold", r:"tfc:ceramic/unfired_mace_head_mold", p:["XX XX","X   X","X   X","X   X","XX XX"]},
+  {n:"pan", r:"tfc:ceramic/unfired_pan", p:["X   X","XXXXX"," XXX "]},
+  {n:"pickaxe_head_mold", r:"tfc:ceramic/unfired_pickaxe_head_mold", p:["XXXXX","X   X"," XXX ","XXXXX"]},
+  {n:"pot", r:"tfc:ceramic/unfired_pot", p:["X   X","X   X","X   X","XXXXX"," XXX "]},
+  {n:"propick_head_mold", r:"tfc:ceramic/unfired_propick_head_mold", p:["XXXXX","    X"," XXX "," XXXX","XXXXX"]},
+  {n:"saw_blade_mold", r:"tfc:ceramic/unfired_saw_blade_mold", p:["  XXX","   XX","X   X","X    ","XXX  "]},
+  {n:"scythe_blade_mold", r:"tfc:ceramic/unfired_scythe_blade_mold", p:["XXXXX","X    ","    X","  XXX","XXXXX"]},
+  {n:"shovel_head_mold", r:"tfc:ceramic/unfired_shovel_head_mold", p:["X   X","X   X","X   X","X   X","XX XX"]},
+  {n:"spindle_head", r:"tfc:ceramic/unfired_spindle_head", p:["  X  ","XXXXX","  X  "]},
+  {n:"sword_blade_mold", r:"tfc:ceramic/unfired_sword_blade_mold", p:["  XXX","   XX","X   X","XX  X","XXXX "]},
+  {n:"vessel", r:"tfc:ceramic/unfired_vessel", p:[" XXX ","XXXXX","XXXXX","XXXXX"," XXX "]},
+  {n:"fire_brick", r:"tfc:ceramic/unfired_fire_brick", p:["XXXXX","     ","XXXXX","     ","XXXXX"]},
+  {n:"crucible", r:"tfc:ceramic/unfired_crucible", p:["X   X","X   X","X   X","X   X","XXXXX"]},
+  {n:"fire_ingot_mold", r:"tfc:ceramic/unfired_fire_ingot_mold", p:["XXXX","X  X","X  X","X  X","XXXX"]},
+];
+
+// All unfired items the clay mode can produce (full item ids).
 const CLAY_ITEMS = [
-    "tfc:ceramic/unfired_vessel",
-    "tfc:ceramic/unfired_pot",
-    "tfc:ceramic/unfired_bowl",
-    "tfc:ceramic/unfired_jug",
-    "tfc:ceramic/unfired_pan",
-    "tfc:ceramic/unfired_flower_pot",
-    "tfc:ceramic/unfired_brick",
+  "tfc:ceramic/unfired_axe_head_mold",
+  "tfc:ceramic/unfired_bell_mold",
+  "tfc:ceramic/unfired_blowpipe",
+  "tfc:ceramic/unfired_bowl",
+  "tfc:ceramic/unfired_brick",
+  "tfc:ceramic/unfired_chisel_head_mold",
+  "tfc:ceramic/unfired_flower_pot",
+  "tfc:ceramic/unfired_hammer_head_mold",
+  "tfc:ceramic/unfired_hoe_head_mold",
+  "tfc:ceramic/unfired_ingot_mold",
+  "tfc:ceramic/unfired_javelin_head_mold",
+  "tfc:ceramic/unfired_jug",
+  "tfc:ceramic/unfired_knife_blade_mold",
+  "tfc:ceramic/unfired_large_vessel",
+  "tfc:ceramic/unfired_mace_head_mold",
+  "tfc:ceramic/unfired_pan",
+  "tfc:ceramic/unfired_pickaxe_head_mold",
+  "tfc:ceramic/unfired_pot",
+  "tfc:ceramic/unfired_propick_head_mold",
+  "tfc:ceramic/unfired_saw_blade_mold",
+  "tfc:ceramic/unfired_scythe_blade_mold",
+  "tfc:ceramic/unfired_shovel_head_mold",
+  "tfc:ceramic/unfired_spindle_head",
+  "tfc:ceramic/unfired_sword_blade_mold",
+  "tfc:ceramic/unfired_vessel",
+  "tfc:ceramic/unfired_fire_brick",
+  "tfc:ceramic/unfired_crucible",
+  "tfc:ceramic/unfired_fire_ingot_mold",
 ];
 
 /** layers[y][z][x] */
@@ -463,6 +520,51 @@ function applyClay() {
     resultInput.value = clayItemSel.value;
 }
 
+function fillClayTemplateSelect() {
+    clayTemplateSel.innerHTML = "";
+    for (let i = 0; i < CLAY_TEMPLATES.length; i++) {
+        const opt = document.createElement("option");
+        opt.value = String(i);
+        opt.textContent = prettify(CLAY_TEMPLATES[i].n);
+        clayTemplateSel.appendChild(opt);
+    }
+    clayTemplateSel.value = "0";
+}
+
+/** Load a single-layer pattern (array of row strings) into the grid, centred. */
+function loadTemplatePattern(rows) {
+    const blank = blankLayer();
+    const height = rows.length;
+    const width = rows.reduce((m, r) => Math.max(m, r.length), 0);
+    const offX = Math.floor((SIZE_X - width) / 2);
+    const offZ = Math.floor((SIZE_Z - height) / 2);
+    for (let z = 0; z < height; z++) {
+        const row = rows[z];
+        for (let x = 0; x < row.length; x++) {
+            const ch = row[x];
+            if (ch === "#" || ch === "X" || ch === "x" || ch === "1") {
+                const px = offX + x, pz = offZ + z;
+                if (px >= 0 && px < SIZE_X && pz >= 0 && pz < SIZE_Z) blank[pz][px] = METAL;
+            }
+        }
+    }
+    layers = [blank];
+    active = 0;
+    refresh();
+}
+
+/** Apply the selected template: load its 5x5 pattern and set the result item. */
+function applyTemplate() {
+    const idx = parseInt(clayTemplateSel.value, 10);
+    const tpl = CLAY_TEMPLATES[idx];
+    if (!tpl) return;
+    ingredientInput.value = "tfc:clay";
+    ensureOption(clayItemSel, tpl.r);
+    resultInput.value = tpl.r;
+    loadTemplatePattern(tpl.p);
+    jsonEl.value = buildJson();
+}
+
 /** Show only the fields that apply to the current mode and recompute the recipe fields. */
 function applyMode() {
     const clay = modeSel.value === "clay";
@@ -473,14 +575,15 @@ function applyMode() {
     floorRow.style.display = clay ? "none" : "";
     optimalRow.style.display = clay ? "none" : "";
     clayItemRow.style.display = clay ? "" : "none";
+    clayTemplateRow.style.display = clay ? "" : "none";
     perClayRow.style.display = clay ? "" : "none";
     ingredientInput.readOnly = clay;
 
     if (clay) {
         applyClay();
         modeHint.textContent =
-            "Лепка: ингредиент — глина (тег tfc:clay). «Изделие» задаёт результат (невыпеченный предмет), " +
-            "«вокселей на глину» — сколько вокселей даёт один кусок глины.";
+            "Лепка: «шаблон» — готовый чертёж TFC (5×5) для форм/посуды, загружает сетку и результат. " +
+            "«Изделие» — результат (невыпеченный предмет). «Вокселей на глину» — сколько вокселей даёт кусок глины.";
     } else {
         applyMetal();
         modeHint.textContent =
@@ -751,6 +854,7 @@ metalSel.addEventListener("change", applyMetal);
 itemSel.addEventListener("change", applyItem);
 modeSel.addEventListener("change", applyMode);
 clayItemSel.addEventListener("change", () => { applyClay(); jsonEl.value = buildJson(); });
+clayTemplateSel.addEventListener("change", applyTemplate);
 
 ["tier", "floor", "optimal", "perClay", "ingredient", "result", "count"].forEach(id => {
     document.getElementById(id).addEventListener("input", () => { jsonEl.value = buildJson(); });
@@ -774,6 +878,7 @@ document.addEventListener("keydown", e => {
 fillMetalSelect();
 fillItemSelect();
 fillClayItemSelect();
+fillClayTemplateSelect();
 applyMode();
 </script>
 </body>

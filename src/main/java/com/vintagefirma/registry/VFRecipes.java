@@ -2,6 +2,7 @@ package com.vintagefirma.registry;
 
 import com.vintagefirma.VintageFirma;
 import com.vintagefirma.common.ClayRecipe;
+import com.vintagefirma.common.RockRecipe;
 import com.vintagefirma.common.SmithingRecipe;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
@@ -33,6 +34,14 @@ public final class VFRecipes
 
     public static final RegistryObject<RecipeSerializer<ClayRecipe>> CLAY_SERIALIZER =
         RECIPE_SERIALIZERS.register("clay_forming", ClayRecipe.Serializer::new);
+
+    public static final ResourceLocation ROCK_ID = new ResourceLocation(VintageFirma.MOD_ID, "rock_knapping");
+
+    public static final RegistryObject<RecipeType<RockRecipe>> ROCK_TYPE =
+        RECIPE_TYPES.register("rock_knapping", () -> RecipeType.simple(ROCK_ID));
+
+    public static final RegistryObject<RecipeSerializer<RockRecipe>> ROCK_SERIALIZER =
+        RECIPE_SERIALIZERS.register("rock_knapping", RockRecipe.Serializer::new);
 
     private VFRecipes() {}
 }

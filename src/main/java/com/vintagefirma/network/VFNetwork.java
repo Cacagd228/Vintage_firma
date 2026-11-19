@@ -93,10 +93,46 @@ public final class VFNetwork
             .consumerMainThread(C2SClaySculptPacket::handle)
             .add();
 
-        CHANNEL.messageBuilder(S2CSyncClayPacket.class, id, NetworkDirection.PLAY_TO_CLIENT)
+        CHANNEL.messageBuilder(S2CSyncClayPacket.class, id++, NetworkDirection.PLAY_TO_CLIENT)
             .encoder(S2CSyncClayPacket::encode)
             .decoder(S2CSyncClayPacket::decode)
             .consumerMainThread(S2CSyncClayPacket::handle)
+            .add();
+
+        CHANNEL.messageBuilder(S2COpenRockSelectionPacket.class, id++, NetworkDirection.PLAY_TO_CLIENT)
+            .encoder(S2COpenRockSelectionPacket::encode)
+            .decoder(S2COpenRockSelectionPacket::decode)
+            .consumerMainThread(S2COpenRockSelectionPacket::handle)
+            .add();
+
+        CHANNEL.messageBuilder(C2SRockInteractPacket.class, id++, NetworkDirection.PLAY_TO_SERVER)
+            .encoder(C2SRockInteractPacket::encode)
+            .decoder(C2SRockInteractPacket::decode)
+            .consumerMainThread(C2SRockInteractPacket::handle)
+            .add();
+
+        CHANNEL.messageBuilder(C2SSelectRockRecipePacket.class, id++, NetworkDirection.PLAY_TO_SERVER)
+            .encoder(C2SSelectRockRecipePacket::encode)
+            .decoder(C2SSelectRockRecipePacket::decode)
+            .consumerMainThread(C2SSelectRockRecipePacket::handle)
+            .add();
+
+        CHANNEL.messageBuilder(C2SRockChipPacket.class, id++, NetworkDirection.PLAY_TO_SERVER)
+            .encoder(C2SRockChipPacket::encode)
+            .decoder(C2SRockChipPacket::decode)
+            .consumerMainThread(C2SRockChipPacket::handle)
+            .add();
+
+        CHANNEL.messageBuilder(C2SRockRemovePacket.class, id++, NetworkDirection.PLAY_TO_SERVER)
+            .encoder(C2SRockRemovePacket::encode)
+            .decoder(C2SRockRemovePacket::decode)
+            .consumerMainThread(C2SRockRemovePacket::handle)
+            .add();
+
+        CHANNEL.messageBuilder(S2CSyncRockPacket.class, id, NetworkDirection.PLAY_TO_CLIENT)
+            .encoder(S2CSyncRockPacket::encode)
+            .decoder(S2CSyncRockPacket::decode)
+            .consumerMainThread(S2CSyncRockPacket::handle)
             .add();
     }
 
