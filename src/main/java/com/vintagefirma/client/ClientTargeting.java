@@ -129,8 +129,10 @@ public final class ClientTargeting
 
             final double px = eye.x + dir.x * t;
             final double pz = eye.z + dir.z * t;
-            final int gx = (int) Math.floor(px - pos.getX());
-            final int gz = (int) Math.floor(pz - pos.getZ());
+            // The 16 x 16 grid spans one block, so the offset within the block (0..1) maps to a voxel
+            // index by multiplying with the grid size.
+            final int gx = (int) Math.floor((px - pos.getX()) * Voxels.SIZE_X);
+            final int gz = (int) Math.floor((pz - pos.getZ()) * Voxels.SIZE_Z);
             if (gx < 0 || gx >= Voxels.SIZE_X || gz < 0 || gz >= Voxels.SIZE_Z) continue;
 
             if (t * t < bestDistance)
