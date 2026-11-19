@@ -1,0 +1,24 @@
+{
+  "type": "vintage_firma:smithing",
+  "ingredient": {
+    "item": "tfc:raw_iron_bloom"
+  },
+  "metal": "wrought_iron",
+  "tier": 2,
+  "pattern_floor": 0,
+  "pattern": [
+    [
+      "#######",
+      "#######",
+      "#######"
+    ],
+    [
+      "#######",
+      "#######",
+      "#######"
+    ]
+  ],
+  "result": {
+    "item": "tfc:metal/ingot/wrought_iron"
+  }
+}

@@ -1,0 +1,81 @@
+{
+  "item.vintage_firma.work_item": "Заготовка",
+  "item.vintage_firma.work_item.named": "Заготовка: %s",
+
+  "vintage_firma.metal.wrought_iron": "Кованое железо",
+  "vintage_firma.metal.cast_iron": "Чугун",
+  "vintage_firma.metal.steel": "Сталь",
+
+  "vintage_firma.tooltip.metal": "Металл: %s",
+  "vintage_firma.tooltip.voxels": "Воксели: %s (%s ед. металла)",
+  "vintage_firma.tooltip.quality": "Удары: %s / %s (+%s остываний)",
+
+  "vintage_firma.hammer_mode.heavy_hit": "Тяжёлый удар",
+  "vintage_firma.hammer_mode.upset_forward": "Выдавить вперёд",
+  "vintage_firma.hammer_mode.upset_right": "Выдавить вправо",
+  "vintage_firma.hammer_mode.upset_back": "Выдавить назад",
+  "vintage_firma.hammer_mode.upset_left": "Выдавить влево",
+  "vintage_firma.hammer_mode.split": "Разрезать",
+
+  "vintage_firma.hammer_short.HEAVY_HIT": "Тяжёлый",
+  "vintage_firma.hammer_short.UPSET_FORWARD": "Вперёд",
+  "vintage_firma.hammer_short.UPSET_RIGHT": "Вправо",
+  "vintage_firma.hammer_short.UPSET_BACK": "Назад",
+  "vintage_firma.hammer_short.UPSET_LEFT": "Влево",
+  "vintage_firma.hammer_short.SPLIT": "Разрез",
+
+  "vintage_firma.hud.mode": "Режим молота: %s",
+  "vintage_firma.screen.hammer_mode": "Режим молота",
+
+  "vintage_firma.message.not_smithable": "Этот предмет нельзя ковать",
+  "vintage_firma.message.no_ingot": "Нужен подходящий горячий слиток в руке",
+  "vintage_firma.message.ingot_too_cold": "Слиток слишком холодный для ковки",
+  "vintage_firma.message.work_too_cold": "Заготовка слишком холодная для ковки",
+  "vintage_firma.message.work_started": "Начата ковка: %s",
+  "vintage_firma.message.work_taken": "Заготовка взята",
+  "vintage_firma.message.work_placed": "Заготовка положена на наковальню",
+  "vintage_firma.message.take_work_first": "Сначала заберите заготовку",
+  "vintage_firma.message.wrong_metal": "Этот слиток не подходит к заготовке",
+  "vintage_firma.message.needs_flattening": "Нет места для ещё одного слитка, сначала расплющите заготовку",
+  "vintage_firma.message.needs_flattening_sheet": "Нет места для ещё одной пластины, сначала расплющите заготовку",
+  "vintage_firma.message.ingot_added": "Добавлено металла: %s вокселей",
+  "vintage_firma.message.sheet_added": "Добавлено металла: %s вокселей",
+  "vintage_firma.message.completed": "Ковка завершена: %s",
+  "vintage_firma.message.anvil_too_low_tier": "Эта наковальня слишком низкого тира для %s",
+  "vintage_firma.message.conversion_started": "Начата переработка: %s",
+  "vintage_firma.message.conversion_hint": "Сбивайте шлак молотом в режиме «Разрезать» (V)",
+
+  "vintage_firma.message.weld_need_two": "Для сварки нужны два горячих слитка или пластины одного металла",
+  "vintage_firma.message.weld_different_metal": "Предметы из разных металлов",
+  "vintage_firma.message.weld_too_cold": "Оба предмета должны быть сварочной температуры",
+  "vintage_firma.message.weld_need_pair": "Для сварки нужны два слитка или две пластины, не смесь",
+  "vintage_firma.message.weld_stone_anvil_copper_only": "Каменная наковальня сваривает только медь",
+  "vintage_firma.message.weld_no_result": "У этого металла нет свариваемого предмета",
+  "vintage_firma.message.weld_done": "Сварено: %s",
+  "vintage_firma.message.ingot_too_cold_place": "Слиток слишком холодный для работы",
+
+  "vintage_firma.screen.select_recipe": "Выберите рецепт ковки",
+  "vintage_firma.screen.recipe_hint": "Shift + ПКМ со слитком или пластиной, чтобы начать",
+  "vintage_firma.screen.recipe_info": "%s вокселей, %s слитка(-ов)",
+
+  "vintage_firma.command.cannot_heat": "Этот предмет нельзя нагреть",
+  "vintage_firma.command.heated": "%s теперь при %s °C",
+  "vintage_firma.command.ingot": "Получен горячий слиток кованого железа",
+  "vintage_firma.command.no_anvil": "Посмотрите на наковальню из кованого железа",
+  "vintage_firma.command.no_work": "На этой наковальне нет заготовки",
+  "vintage_firma.command.unknown_target": "Неизвестная цель: %s",
+  "vintage_firma.command.bad_slot": "Слот %s вне диапазона",
+
+  "key.vintage_firma.cycle_mode": "Сменить режим молота",
+  "key.categories.vintage_firma": "Vintage Firma",
+
+  "vintage_firma.screen.select_clay": "Выберите изделие из глины",
+  "vintage_firma.screen.clay_hint": "Shift + ПКМ по блоку с глиной в руке, чтобы начать",
+  "vintage_firma.screen.clay_info": "%s вокселей, ~%s глины",
+
+  "vintage_firma.message.clay_started": "Начата лепка: %s",
+  "vintage_firma.message.clay_completed": "Готово: %s",
+  "vintage_firma.message.clay_need_clay": "Нужна глина в руке",
+  "vintage_firma.message.clay_need_surface": "Для глины нужна твёрдая поверхность",
+  "vintage_firma.message.clay_no_recipe": "Нет рецептов лепки"
+}

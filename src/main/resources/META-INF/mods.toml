@@ -1,0 +1,31 @@
+modLoader="javafml"
+loaderVersion="[47,)"
+license="MIT"
+
+[[mods]]
+modId="vintage_firma"
+version="${file.jarVersion}"
+displayName="${mod_name}"
+authors="${mod_authors}"
+description='''${mod_description}'''
+
+[[dependencies.vintage_firma]]
+    modId="forge"
+    mandatory=true
+    versionRange="[47.1.3,)"
+    ordering="NONE"
+    side="BOTH"
+
+[[dependencies.vintage_firma]]
+    modId="minecraft"
+    mandatory=true
+    versionRange="[1.20.1,1.21)"
+    ordering="NONE"
+    side="BOTH"
+
+[[dependencies.vintage_firma]]
+    modId="tfc"
+    mandatory=true
+    versionRange="[3.2.0,)"
+    ordering="AFTER"
+    side="BOTH"

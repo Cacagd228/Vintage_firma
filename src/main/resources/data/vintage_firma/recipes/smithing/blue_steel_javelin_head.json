@@ -1,0 +1,23 @@
+{
+  "type": "vintage_firma:smithing",
+  "ingredient": {
+    "item": "tfc:metal/ingot/blue_steel"
+  },
+  "metal": "blue_steel",
+  "tier": 6,
+  "pattern_floor": 0,
+  "pattern": [
+    [
+      ".#.",
+      "###",
+      "###",
+      "###",
+      "###",
+      "###",
+      "###"
+    ]
+  ],
+  "result": {
+    "item": "tfc:metal/javelin_head/blue_steel"
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "type": "vintage_firma:smithing",
+  "ingredient": {
+    "item": "tfc:metal/ingot/pig_iron"
+  },
+  "metal": "steel",
+  "tier": 3,
+  "pattern_floor": 0,
+  "pattern": [
+    [
+      "#######",
+      "#######",
+      "#######"
+    ],
+    [
+      "#######",
+      "#######",
+      "#######"
+    ]
+  ],
+  "result": {
+    "item": "tfc:metal/ingot/steel"
+  }
+}

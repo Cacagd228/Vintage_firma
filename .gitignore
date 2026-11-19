@@ -1,0 +1,34 @@
+# eclipse
+bin
+*.launch
+.settings
+.metadata
+.classpath
+.project
+
+# idea
+out
+*.ipr
+*.iws
+*.iml
+.idea
+
+# gradle
+build
+.gradle
+
+# other
+eclipse
+run
+
+# Files from Forge MDK
+forge*changelog.txt
+
+# runtime / logs
+run-data
+run-data.log
+run_data.log
+build_compile.log
+
+# dependency jars (TerraFirmaCraft / Patchouli) - not committed, see libs/README.md
+libs/

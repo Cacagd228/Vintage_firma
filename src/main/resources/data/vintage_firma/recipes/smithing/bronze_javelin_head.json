@@ -1,0 +1,23 @@
+{
+  "type": "vintage_firma:smithing",
+  "ingredient": {
+    "item": "tfc:metal/ingot/bronze"
+  },
+  "metal": "bronze",
+  "tier": 2,
+  "pattern_floor": 0,
+  "pattern": [
+    [
+      ".#.",
+      "###",
+      "###",
+      "###",
+      "###",
+      "###",
+      "###"
+    ]
+  ],
+  "result": {
+    "item": "tfc:metal/javelin_head/bronze"
+  }
+}

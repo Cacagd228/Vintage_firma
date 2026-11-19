@@ -1,0 +1,18 @@
+{
+  "type": "vintage_firma:smithing",
+  "ingredient": {
+    "item": "tfc:metal/ingot/copper"
+  },
+  "metal": "copper",
+  "tier": 1,
+  "pattern_floor": 0,
+  "pattern": [
+    [
+      "#######",
+      ".######"
+    ]
+  ],
+  "result": {
+    "item": "tfc:metal/propick_head/copper"
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "type": "vintage_firma:clay_forming",
+  "ingredient": { "tag": "tfc:clay" },
+  "pattern": [
+    ["###", "###", "###"],
+    ["#.#", "#.#", "#.#"],
+    ["#.#", "#.#", "#.#"]
+  ],
+  "result": { "item": "tfc:ceramic/unfired_vessel" },
+  "voxels_per_clay": 25
+}

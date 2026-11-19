@@ -1,0 +1,23 @@
+{
+  "type": "vintage_firma:smithing",
+  "ingredient": {
+    "item": "tfc:metal/ingot/bismuth_bronze"
+  },
+  "metal": "bismuth_bronze",
+  "tier": 2,
+  "pattern_floor": 0,
+  "pattern": [
+    [
+      ".#.",
+      "###",
+      "###",
+      "###",
+      "###",
+      "###",
+      "###"
+    ]
+  ],
+  "result": {
+    "item": "tfc:metal/javelin_head/bismuth_bronze"
+  }
+}

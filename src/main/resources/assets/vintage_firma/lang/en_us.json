@@ -1,0 +1,81 @@
+{
+  "item.vintage_firma.work_item": "Work Item",
+  "item.vintage_firma.work_item.named": "%s Work Item",
+
+  "vintage_firma.metal.wrought_iron": "Wrought Iron",
+  "vintage_firma.metal.cast_iron": "Cast Iron",
+  "vintage_firma.metal.steel": "Steel",
+
+  "vintage_firma.tooltip.metal": "Metal: %s",
+  "vintage_firma.tooltip.voxels": "Voxels: %s (%s pieces of metal)",
+  "vintage_firma.tooltip.quality": "Strikes: %s / %s (+%s cooling)",
+
+  "vintage_firma.hammer_mode.heavy_hit": "Heavy Hit",
+  "vintage_firma.hammer_mode.upset_forward": "Upset Forward",
+  "vintage_firma.hammer_mode.upset_right": "Upset Right",
+  "vintage_firma.hammer_mode.upset_back": "Upset Back",
+  "vintage_firma.hammer_mode.upset_left": "Upset Left",
+  "vintage_firma.hammer_mode.split": "Split",
+
+  "vintage_firma.hammer_short.HEAVY_HIT": "Heavy",
+  "vintage_firma.hammer_short.UPSET_FORWARD": "Fwd",
+  "vintage_firma.hammer_short.UPSET_RIGHT": "Right",
+  "vintage_firma.hammer_short.UPSET_BACK": "Back",
+  "vintage_firma.hammer_short.UPSET_LEFT": "Left",
+  "vintage_firma.hammer_short.SPLIT": "Split",
+
+  "vintage_firma.hud.mode": "Hammer mode: %s",
+  "vintage_firma.screen.hammer_mode": "Hammer Mode",
+
+  "vintage_firma.message.not_smithable": "This item cannot be forged",
+  "vintage_firma.message.no_ingot": "You need a matching hot ingot in your hand",
+  "vintage_firma.message.ingot_too_cold": "The ingot is too cold to be worked",
+  "vintage_firma.message.work_too_cold": "The work item is too cold to be hammered",
+  "vintage_firma.message.work_started": "Started forging: %s",
+  "vintage_firma.message.work_taken": "Work item taken",
+  "vintage_firma.message.work_placed": "Work item placed on the anvil",
+  "vintage_firma.message.take_work_first": "Take the work item first",
+  "vintage_firma.message.wrong_metal": "This ingot does not match the work item",
+  "vintage_firma.message.needs_flattening": "There is no room for more metal, flatten the work item first",
+  "vintage_firma.message.needs_flattening_sheet": "There is no room for another sheet, hammer the work item flat first",
+  "vintage_firma.message.ingot_added": "Added %s voxels of metal",
+  "vintage_firma.message.sheet_added": "Added %s voxels of metal",
+  "vintage_firma.message.completed": "Forging complete: %s",
+  "vintage_firma.message.anvil_too_low_tier": "This anvil is too low tier to forge %s",
+  "vintage_firma.message.conversion_started": "Conversion started: %s",
+  "vintage_firma.message.conversion_hint": "Hammer the slag off the metal with Split (V)",
+
+  "vintage_firma.message.weld_need_two": "Welding needs two hot ingots or sheets of the same metal",
+  "vintage_firma.message.weld_different_metal": "The two pieces are not the same metal",
+  "vintage_firma.message.weld_too_cold": "Both pieces must be at welding temperature",
+  "vintage_firma.message.weld_need_pair": "Welding needs two ingots or two sheets, not a mix",
+  "vintage_firma.message.weld_stone_anvil_copper_only": "A rock anvil can only weld copper",
+  "vintage_firma.message.weld_no_result": "This metal has no weldable piece",
+  "vintage_firma.message.weld_done": "Welded: %s",
+  "vintage_firma.message.ingot_too_cold_place": "The ingot is too cold to be worked",
+
+  "vintage_firma.screen.select_recipe": "Select a smithing recipe",
+  "vintage_firma.screen.recipe_hint": "Shift + right click with an ingot or a sheet to start",
+  "vintage_firma.screen.recipe_info": "%s voxels, %s ingots",
+
+  "vintage_firma.command.cannot_heat": "That item cannot be heated",
+  "vintage_firma.command.heated": "%s is now at %s °C",
+  "vintage_firma.command.ingot": "Received a hot wrought iron ingot",
+  "vintage_firma.command.no_anvil": "Look at a wrought iron anvil",
+  "vintage_firma.command.no_work": "That anvil has no work item",
+  "vintage_firma.command.unknown_target": "Unknown target: %s",
+  "vintage_firma.command.bad_slot": "Slot %s is out of range",
+
+  "key.vintage_firma.cycle_mode": "Cycle hammer mode",
+  "key.categories.vintage_firma": "Vintage Firma",
+
+  "vintage_firma.screen.select_clay": "Select a clay recipe",
+  "vintage_firma.screen.clay_hint": "Shift + right click a block with clay in hand to start",
+  "vintage_firma.screen.clay_info": "%s voxels, ~%s clay",
+
+  "vintage_firma.message.clay_started": "Started shaping: %s",
+  "vintage_firma.message.clay_completed": "Finished: %s",
+  "vintage_firma.message.clay_need_clay": "You need clay in your hand",
+  "vintage_firma.message.clay_need_surface": "Clay needs a solid surface to rest on",
+  "vintage_firma.message.clay_no_recipe": "There are no clay recipes"
+}

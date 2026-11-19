@@ -1,0 +1,24 @@
+{
+  "type": "vintage_firma:smithing",
+  "ingredient": {
+    "item": "tfc:metal/ingot/steel"
+  },
+  "metal": "steel",
+  "tier": 4,
+  "pattern_floor": 0,
+  "pattern": [
+    [
+      ".###.",
+      "#####",
+      "#####",
+      "#####",
+      "#####",
+      "#####",
+      "..#..",
+      "..#.."
+    ]
+  ],
+  "result": {
+    "item": "tfc:metal/shovel_head/steel"
+  }
+}

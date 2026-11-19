@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Vintage Firma — редактор паттернов ковки</title>
+<style>
+  :root {
+    --bg:#14110e; --panel:#1e1a15; --panel2:#2a241c; --line:#3a3128;
+    --text:#e8dcc8; --dim:#9a8f7d; --accent:#d98a3a; --accent2:#f0b060;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);font:13px/1.45 "Segoe UI",Tahoma,sans-serif}
+  header{padding:10px 16px;background:var(--panel);border-bottom:1px solid var(--line);display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+  header h1{font-size:15px;margin:0;font-weight:600}
+  header .hint{color:var(--dim);font-size:12px;max-width:900px}
+  main{display:flex;gap:16px;padding:16px;align-items:flex-start;flex-wrap:wrap}
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:4px;padding:12px}
+  .panel h2{font-size:11px;text-transform:uppercase;letter-spacing:.6px;color:var(--accent);margin:0 0 10px}
+  canvas{background:#0d0b09;border:1px solid var(--line);display:block}
+  #grid{cursor:crosshair;touch-action:none}
+  .layers{display:flex;gap:4px;flex-wrap:wrap;justify-content:center;margin-top:8px}
+  .layer-tab{width:30px;height:30px;border-radius:3px;background:var(--panel2);border:1px solid var(--line);
+    color:var(--dim);cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center;position:relative}
+  .layer-tab.active{border-color:var(--accent);color:var(--accent2);background:#3a2c1c}
+  .layer-tab.has::after{content:"";position:absolute;left:3px;right:3px;bottom:2px;height:2px;background:var(--accent);border-radius:1px}
+  .row{display:flex;gap:6px;align-items:center;margin-bottom:6px}
+  .row label{flex:0 0 126px;color:var(--dim)}
+  input[type=text],input[type=number],select,textarea{background:#0d0b09;color:var(--text);border:1px solid var(--line);
+    border-radius:3px;padding:5px 7px;font:inherit;flex:1;min-width:0}
+  select{cursor:pointer}
+  select:hover,input:hover,textarea:hover{border-color:#4a3f30}
+  textarea{width:100%;height:200px;font-family:Consolas,monospace;font-size:12px;resize:vertical;line-height:1.35}
+  button{background:var(--panel2);color:var(--text);border:1px solid var(--line);border-radius:3px;
+    padding:6px 12px;cursor:pointer;font:inherit}
+  button:hover{border-color:var(--accent);color:var(--accent2)}
+  button.primary{background:#6a3d14;border-color:var(--accent);color:#ffe8c0}
+  .tools{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+  .stats{color:var(--dim);font-size:12px;margin-top:8px;line-height:1.7}
+  .stats b{color:var(--text)}
+  .right{width:352px;flex:0 0 352px}
+  .legend{font-size:12px;color:var(--dim);margin-top:8px}
+  .legend i{display:inline-block;width:10px;height:10px;margin-right:4px;vertical-align:middle;border-radius:2px}
+  .kbd{background:#0d0b09;border:1px solid var(--line);border-radius:3px;padding:1px 5px;font-size:11px}
+  #toast{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);background:#2a241c;border:1px solid var(--accent);
+    color:var(--text);padding:8px 16px;border-radius:4px;opacity:0;pointer-events:none;transition:opacity .15s;z-index:9}
+  #toast.show{opacity:1}
+  .mini{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin-top:8px}
+  .hintline{color:var(--dim);font-size:12px;margin:2px 0 8px;line-height:1.4}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Vintage Firma — редактор паттернов</h1>
+  <span class="hint">
+    ЛКМ — поставить/убрать воксель, ПКМ — убрать. Shift+ЛКМ — линия по X, Shift+ПКМ — линия по Z,
+    Ctrl+ЛКМ — залить слой. Слой 0 — нижний, рисуется на сетке 16×16.
+  </span>
+</header>
+
+<main>
+  <div class="panel">
+    <h2>Слой <span id="layerLabel">0</span> / <span id="layerCount">1</span></h2>
+    <canvas id="grid" width="448" height="448"></canvas>
+    <div class="layers" id="layerTabs"></div>
+    <div class="mini">
+      <button id="addLayer">+ Слой</button>
+      <button id="delLayer">− Слой</button>
+      <button id="upLayer">Выше</button>
+      <button id="downLayer">Ниже</button>
+      <button id="clearLayer">Очистить слой</button>
+    </div>
+    <div class="legend">
+      <i style="background:#9a9a99"></i>воксель &nbsp;
+      <i style="background:#12100d;border:1px solid #3a3128"></i>пусто &nbsp;
+      <span style="color:#d98a3a">＋</span> центр
+    </div>
+  </div>
+
+  <div class="panel right">
+    <h2>Рецепт</h2>
+    <div class="row"><label>режим</label><select id="mode">
+      <option value="smithing">Ковка (наковальня)</option>
+      <option value="clay">Лепка (глина)</option>
+    </select></div>
+    <div class="row" id="metalRow"><label>металл</label><select id="metal"></select></div>
+    <div class="row" id="tierRow"><label>tier наковальни</label><input type="number" id="tier" value="3" min="1" max="6"></div>
+    <div class="row" id="itemRow"><label>предмет</label><select id="item"></select></div>
+    <div class="row" id="clayItemRow" style="display:none"><label>изделие</label><select id="clayItem"></select></div>
+    <div class="row" id="floorRow"><label>pattern_floor</label><input type="number" id="floor" value="0" min="0" max="5"></div>
+    <div class="row" id="optimalRow"><label>optimal_hits</label><input type="number" id="optimal" value="-1" min="-1"></div>
+    <div class="row" id="perClayRow" style="display:none"><label>вокселей на глину</label><input type="number" id="perClay" value="25" min="1" max="999"></div>
+    <div class="row"><label>ингредиент</label><input type="text" id="ingredient"></div>
+    <div class="row"><label>результат</label><input type="text" id="result"></div>
+    <div class="row"><label>count</label><input type="number" id="count" value="1" min="1" max="64"></div>
+    <div class="hintline" id="modeHint"></div>
+
+    <div class="stats" id="stats"></div>
+
+    <div class="tools">
+      <button class="primary" id="copy">Копировать JSON</button>
+      <button id="download">Скачать</button>
+      <button id="loadFile">Загрузить</button>
+      <button id="clearAll">Очистить всё</button>
+    </div>
+    <div class="row" style="margin-top:8px"><label>имя файла</label><input type="text" id="fileName" value="my_recipe"></div>
+
+    <h2 style="margin-top:12px">JSON</h2>
+    <textarea id="json" spellcheck="false"></textarea>
+  </div>
+</main>
+
+<div id="toast"></div>
+
+<script>
+"use strict";
+
+const SIZE_X = 16, SIZE_Y = 6, SIZE_Z = 16;
+const CELL = 28;
+
+const grid = document.getElementById("grid");
+const ctx = grid.getContext("2d");
+const layersEl = document.getElementById("layerTabs");
+const statsEl = document.getElementById("stats");
+const jsonEl = document.getElementById("json");
+const toastEl = document.getElementById("toast");
+
+const metalSel = document.getElementById("metal");
+const itemSel = document.getElementById("item");
+const clayItemSel = document.getElementById("clayItem");
+const modeSel = document.getElementById("mode");
+const tierInput = document.getElementById("tier");
+const floorInput = document.getElementById("floor");
+const optimalInput = document.getElementById("optimal");
+const perClayInput = document.getElementById("perClay");
+const ingredientInput = document.getElementById("ingredient");
+const resultInput = document.getElementById("result");
+const countInput = document.getElementById("count");
+const fileNameInput = document.getElementById("fileName");
+const modeHint = document.getElementById("modeHint");
+const metalRow = document.getElementById("metalRow");
+const tierRow = document.getElementById("tierRow");
+const itemRow = document.getElementById("itemRow");
+const clayItemRow = document.getElementById("clayItemRow");
+const floorRow = document.getElementById("floorRow");
+const optimalRow = document.getElementById("optimalRow");
+const perClayRow = document.getElementById("perClayRow");
+
+const EMPTY = 0, METAL = 1;
+
+// Metals supported by the mod: id -> anvil tier required to work them.
+const METALS = {
+    copper: 1, bismuth_bronze: 2, black_bronze: 2, bronze: 2,
+    wrought_iron: 3, steel: 4, black_steel: 5, blue_steel: 6, red_steel: 6,
+};
+
+// Craftable parts: id -> result path (without the metal suffix).
+const PARTS = {
+    shovel_head: "metal/shovel_head",
+    pickaxe_head: "metal/pickaxe_head",
+    axe_head: "metal/axe_head",
+    hoe_head: "metal/hoe_head",
+    hammer_head: "metal/hammer_head",
+    knife_blade: "metal/knife_blade",
+    sword_blade: "metal/sword_blade",
+    javelin_head: "metal/javelin_head",
+    mace_head: "metal/mace_head",
+    scythe_blade: "metal/scythe_blade",
+    saw_blade: "metal/saw_blade",
+    chisel_head: "metal/chisel_head",
+    propick_head: "metal/propick_head",
+    fish_hook: "metal/fish_hook",
+    rod: "metal/rod",
+    bars: "metal/bars",
+    sheet: "metal/sheet",
+    chain: "metal/chain",
+    lamp: "metal/unfinished_lamp",
+    trapdoor: "metal/trapdoor",
+    tuyere: "metal/tuyere",
+    grill: "metal/grill",
+    unfinished_helmet: "metal/unfinished_helmet",
+    unfinished_chestplate: "metal/unfinished_chestplate",
+    unfinished_greaves: "metal/unfinished_greaves",
+    unfinished_boots: "metal/unfinished_boots",
+    shield: "metal/shield",
+};
+
+// Unfired TFC pottery that clay forming can produce (full item ids, no metal suffix).
+const CLAY_ITEMS = [
+    "tfc:ceramic/unfired_vessel",
+    "tfc:ceramic/unfired_pot",
+    "tfc:ceramic/unfired_bowl",
+    "tfc:ceramic/unfired_jug",
+    "tfc:ceramic/unfired_pan",
+    "tfc:ceramic/unfired_flower_pot",
+    "tfc:ceramic/unfired_brick",
+];
+
+/** layers[y][z][x] */
+let layers = [blankLayer()];
+let active = 0;
+let dragValue = null;
+let dragMode = null;   // "toggle" | "paint" | "erase" | "lineX" | "lineZ"
+let dragStart = null;
+
+function blankLayer() {
+    const layer = [];
+    for (let z = 0; z < SIZE_Z; z++) {
+        layer.push(new Array(SIZE_X).fill(EMPTY));
+    }
+    return layer;
+}
+
+function toast(message) {
+    toastEl.textContent = message;
+    toastEl.classList.add("show");
+    clearTimeout(toastEl._t);
+    toastEl._t = setTimeout(() => toastEl.classList.remove("show"), 1400);
+}
+
+function prettify(id) {
+    const s = String(id).replace(/_/g, " ");
+    return s.charAt(0).toUpperCase() + s.slice(1);
+}
+
+// ------------------------------------------------------------------ drawing
+
+function draw() {
+    ctx.clearRect(0, 0, grid.width, grid.height);
+    ctx.fillStyle = "#0d0b09";
+    ctx.fillRect(0, 0, grid.width, grid.height);
+
+    const layer = layers[active];
+    for (let z = 0; z < SIZE_Z; z++) {
+        for (let x = 0; x < SIZE_X; x++) {
+            const px = x * CELL;
+            const py = z * CELL;
+            if (layer[z][x] === METAL) {
+                const grad = ctx.createLinearGradient(px, py, px + CELL, py + CELL);
+                grad.addColorStop(0, "#b9b9b6");
+                grad.addColorStop(0.5, "#9a9a99");
+                grad.addColorStop(1, "#7d7d7c");
+                ctx.fillStyle = grad;
+                ctx.fillRect(px, py, CELL, CELL);
+                ctx.fillStyle = "rgba(255,255,255,0.20)";
+                ctx.fillRect(px, py, CELL, 2);
+                ctx.fillStyle = "rgba(0,0,0,0.30)";
+                ctx.fillRect(px, py + CELL - 2, CELL, 2);
+            } else {
+                ctx.fillStyle = (x + z) % 2 === 0 ? "#12100d" : "#15120f";
+                ctx.fillRect(px, py, CELL, CELL);
+            }
+            ctx.strokeStyle = "rgba(58,49,40,0.6)";
+            ctx.strokeRect(px + 0.5, py + 0.5, CELL - 1, CELL - 1);
+        }
+    }
+
+    // centre marks
+    ctx.strokeStyle = "rgba(217,138,58,0.35)";
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo((SIZE_X / 2) * CELL, 0);
+    ctx.lineTo((SIZE_X / 2) * CELL, grid.height);
+    ctx.moveTo(0, (SIZE_Z / 2) * CELL);
+    ctx.lineTo(grid.width, (SIZE_Z / 2) * CELL);
+    ctx.stroke();
+}
+
+function renderLayerTabs() {
+    layersEl.innerHTML = "";
+    for (let y = 0; y < layers.length; y++) {
+        const tab = document.createElement("div");
+        tab.className = "layer-tab" + (y === active ? " active" : "") + (layerHasMetal(layers[y]) ? " has" : "");
+        tab.textContent = String(y);
+        tab.title = "Слой " + y + (y === 0 ? " (нижний)" : "");
+        tab.onclick = () => { active = y; refresh(); };
+        layersEl.appendChild(tab);
+    }
+}
+
+function layerHasMetal(layer) {
+    for (const row of layer) for (const cell of row) if (cell !== EMPTY) return true;
+    return false;
+}
+
+function patternAsLayers() {
+    // Crop every used layer to the area the pattern actually uses, bottom layer first.
+    const result = [];
+    for (let y = 0; y < layers.length; y++) {
+        if (!layerHasMetal(layers[y])) continue;
+
+        let minX = SIZE_X, maxX = -1, minZ = SIZE_Z, maxZ = -1;
+        for (let z = 0; z < SIZE_Z; z++) {
+            for (let x = 0; x < SIZE_X; x++) {
+                if (layers[y][z][x] === EMPTY) continue;
+                minX = Math.min(minX, x); maxX = Math.max(maxX, x);
+                minZ = Math.min(minZ, z); maxZ = Math.max(maxZ, z);
+            }
+        }
+
+        const rows = [];
+        for (let z = minZ; z <= maxZ; z++) {
+            let row = "";
+            for (let x = minX; x <= maxX; x++) {
+                row += layers[y][z][x] === EMPTY ? "." : "#";
+            }
+            rows.push(row);
+        }
+        result.push(rows);
+    }
+
+    return result.length ? result : [["."]];
+}
+
+function intValue(el, fallback) {
+    const n = parseInt(el.value, 10);
+    return Number.isNaN(n) ? fallback : n;
+}
+
+function buildJson() {
+    // Clay forming: a clay item + a voxel pattern + an unfired result.
+    if (modeSel.value === "clay") {
+        const obj = {
+            type: "vintage_firma:clay_forming",
+            ingredient: { tag: "tfc:clay" },
+            pattern: patternAsLayers(),
+            result: {
+                item: resultInput.value.trim(),
+                count: intValue(countInput, 1)
+            },
+            voxels_per_clay: intValue(perClayInput, 25)
+        };
+        return JSON.stringify(obj, null, 2);
+    }
+
+    const obj = {
+        type: "vintage_firma:smithing",
+        ingredient: { item: ingredientInput.value.trim() },
+        metal: metalSel.value,
+        tier: intValue(tierInput, 1),
+        pattern_floor: intValue(floorInput, 0),
+        pattern: patternAsLayers(),
+        result: {
+            item: resultInput.value.trim(),
+            count: intValue(countInput, 1)
+        }
+    };
+    const optimal = intValue(optimalInput, -1);
+    if (optimal > 0) obj.optimal_hits = optimal;
+
+    return JSON.stringify(obj, null, 2);
+}
+
+function refresh() {
+    draw();
+    renderLayerTabs();
+    document.getElementById("layerLabel").textContent = String(active);
+    document.getElementById("layerCount").textContent = String(layers.length);
+
+    const voxels = countMetal();
+    jsonEl.value = buildJson();
+
+    statsEl.innerHTML =
+        "Вокселей: <b>" + voxels + "</b><br>" +
+        "Слоёв: <b>" + usedLayers() + "</b> из " + layers.length + "<br>" +
+        "Размер: <b>" + patternWidth() + "</b><br>" +
+        "Слитков нужно: <b>" + Math.max(1, Math.ceil(voxels / 42)) + "</b>";
+}
+
+function countMetal() {
+    let n = 0;
+    for (const layer of layers) for (const row of layer) for (const c of row) if (c !== EMPTY) n++;
+    return n;
+}
+
+function patternWidth() {
+    let minX = SIZE_X, maxX = -1, minZ = SIZE_Z, maxZ = -1;
+    for (const layer of layers) {
+        for (let z = 0; z < SIZE_Z; z++) {
+            for (let x = 0; x < SIZE_X; x++) {
+                if (layer[z][x] === EMPTY) continue;
+                minX = Math.min(minX, x); maxX = Math.max(maxX, x);
+                minZ = Math.min(minZ, z); maxZ = Math.max(maxZ, z);
+            }
+        }
+    }
+    if (maxX < 0) return "0×0";
+    return (maxX - minX + 1) + "×" + (maxZ - minZ + 1);
+}
+
+function usedLayers() {
+    let n = 0;
+    for (const layer of layers) if (layerHasMetal(layer)) n++;
+    return n;
+}
+
+// ------------------------------------------------------------------ recipe selects
+
+function fillMetalSelect() {
+    metalSel.innerHTML = "";
+    for (const metal of Object.keys(METALS)) {
+        const opt = document.createElement("option");
+        opt.value = metal;
+        opt.textContent = prettify(metal) + " · tier " + METALS[metal];
+        metalSel.appendChild(opt);
+    }
+    metalSel.value = "wrought_iron";
+}
+
+function fillItemSelect() {
+    itemSel.innerHTML = "";
+    for (const part of Object.keys(PARTS)) {
+        const opt = document.createElement("option");
+        opt.value = part;
+        opt.textContent = prettify(part);
+        itemSel.appendChild(opt);
+    }
+    itemSel.value = "shovel_head";
+}
+
+/** Make sure the select has an option with this value, then select it (for custom/loaded values). */
+function ensureOption(select, value, label) {
+    if (!value) return;
+    for (const opt of select.options) {
+        if (opt.value === value) { select.value = value; return; }
+    }
+    const opt = document.createElement("option");
+    opt.value = value;
+    opt.textContent = label || (prettify(value) + " (свой)");
+    select.appendChild(opt);
+    select.value = value;
+}
+
+/** Recompute tier / ingredient / result from the current metal + item selections. */
+function applyMetal() {
+    const metal = metalSel.value;
+    if (METALS[metal] !== undefined) tierInput.value = METALS[metal];
+    ingredientInput.value = "tfc:metal/ingot/" + metal;
+    applyItem();
+}
+
+function applyItem() {
+    const path = PARTS[itemSel.value];
+    if (path && metalSel.value) {
+        resultInput.value = "tfc:" + path + "/" + metalSel.value;
+    }
+}
+
+function fillClayItemSelect() {
+    clayItemSel.innerHTML = "";
+    for (const id of CLAY_ITEMS) {
+        const opt = document.createElement("option");
+        opt.value = id;
+        opt.textContent = prettify(id.replace("tfc:ceramic/unfired_", ""));
+        clayItemSel.appendChild(opt);
+    }
+    clayItemSel.value = "tfc:ceramic/unfired_vessel";
+}
+
+/** Clay mode: the ingredient is the "tfc:clay" tag and the result is the chosen unfired item. */
+function applyClay() {
+    ingredientInput.value = "tfc:clay";
+    resultInput.value = clayItemSel.value;
+}
+
+/** Show only the fields that apply to the current mode and recompute the recipe fields. */
+function applyMode() {
+    const clay = modeSel.value === "clay";
+
+    metalRow.style.display = clay ? "none" : "";
+    tierRow.style.display = clay ? "none" : "";
+    itemRow.style.display = clay ? "none" : "";
+    floorRow.style.display = clay ? "none" : "";
+    optimalRow.style.display = clay ? "none" : "";
+    clayItemRow.style.display = clay ? "" : "none";
+    perClayRow.style.display = clay ? "" : "none";
+    ingredientInput.readOnly = clay;
+
+    if (clay) {
+        applyClay();
+        modeHint.textContent =
+            "Лепка: ингредиент — глина (тег tfc:clay). «Изделие» задаёт результат (невыпеченный предмет), " +
+            "«вокселей на глину» — сколько вокселей даёт один кусок глины.";
+    } else {
+        applyMetal();
+        modeHint.textContent =
+            "«металл» и «предмет» заполняют tier, ингредиент и результат автоматически — " +
+            "их всё ещё можно поправить вручную (например, для двойных слитков).";
+    }
+
+    refresh();
+}
+
+// ------------------------------------------------------------------ input
+
+function cellFromEvent(evt) {
+    const rect = grid.getBoundingClientRect();
+    // clientLeft/clientTop are the border widths; clientWidth/Height are the drawable box.
+    const x = Math.floor((evt.clientX - rect.left - grid.clientLeft) / grid.clientWidth * SIZE_X);
+    const z = Math.floor((evt.clientY - rect.top - grid.clientTop) / grid.clientHeight * SIZE_Z);
+    if (x < 0 || x >= SIZE_X || z < 0 || z >= SIZE_Z) return null;
+    return { x, z };
+}
+
+function setCell(x, z, value) {
+    if (x < 0 || x >= SIZE_X || z < 0 || z >= SIZE_Z) return;
+    layers[active][z][x] = value;
+}
+
+grid.addEventListener("contextmenu", e => e.preventDefault());
+
+grid.addEventListener("pointerdown", e => {
+    if (e.button !== 0 && e.button !== 2) return;
+    const cell = cellFromEvent(e);
+    if (!cell) return;
+    e.preventDefault();
+    try { grid.setPointerCapture(e.pointerId); } catch (err) {}
+
+    const fill = e.ctrlKey || e.metaKey;
+    const lineX = e.shiftKey && e.button === 0;
+    const lineZ = e.shiftKey && e.button === 2;
+
+    if (fill) {
+        const value = e.button === 2 ? EMPTY : METAL;
+        for (const row of layers[active]) {
+            for (let x = 0; x < SIZE_X; x++) row[x] = value;
+        }
+        refresh();
+        return;
+    }
+
+    if (lineX || lineZ) {
+        dragMode = lineX ? "lineX" : "lineZ";
+        dragStart = cell;
+        dragValue = e.button === 2 ? EMPTY : METAL;
+        setCell(cell.x, cell.z, dragValue);
+        refresh();
+        return;
+    }
+
+    dragMode = e.button === 2 ? "erase" : "toggle";
+    dragValue = layers[active][cell.z][cell.x] === EMPTY ? METAL : EMPTY;
+    setCell(cell.x, cell.z, dragValue);
+    refresh();
+});
+
+grid.addEventListener("pointermove", e => {
+    if (!dragMode) return;
+    const cell = cellFromEvent(e);
+    if (!cell) return;
+
+    if (dragMode === "lineX") {
+        for (let x = Math.min(dragStart.x, cell.x); x <= Math.max(dragStart.x, cell.x); x++) {
+            setCell(x, dragStart.z, dragValue);
+        }
+    } else if (dragMode === "lineZ") {
+        for (let z = Math.min(dragStart.z, cell.z); z <= Math.max(dragStart.z, cell.z); z++) {
+            setCell(dragStart.x, z, dragValue);
+        }
+    } else {
+        setCell(cell.x, cell.z, dragValue);
+    }
+    refresh();
+});
+
+function endDrag(e) {
+    if (!dragMode) return;
+    dragMode = null;
+    dragStart = null;
+    try { grid.releasePointerCapture(e.pointerId); } catch (err) {}
+}
+grid.addEventListener("pointerup", endDrag);
+grid.addEventListener("pointercancel", endDrag);
+
+// ------------------------------------------------------------------ layer buttons
+
+document.getElementById("addLayer").onclick = () => {
+    if (layers.length >= SIZE_Y) { toast("Максимум 6 слоёв"); return; }
+    layers.push(blankLayer());
+    active = layers.length - 1;
+    refresh();
+};
+
+document.getElementById("delLayer").onclick = () => {
+    if (layers.length <= 1) { toast("Нельзя удалить последний слой"); return; }
+    layers.splice(active, 1);
+    if (layers.length === 0) layers.push(blankLayer());
+    active = Math.min(active, layers.length - 1);
+    refresh();
+};
+
+document.getElementById("upLayer").onclick = () => moveLayer(1);
+document.getElementById("downLayer").onclick = () => moveLayer(-1);
+
+function moveLayer(delta) {
+    const target = active + delta;
+    if (target < 0 || target >= layers.length) return;
+    const tmp = layers[active];
+    layers[active] = layers[target];
+    layers[target] = tmp;
+    active = target;
+    refresh();
+}
+
+document.getElementById("clearLayer").onclick = () => {
+    layers[active] = blankLayer();
+    refresh();
+};
+
+document.getElementById("clearAll").onclick = () => {
+    layers = [blankLayer()];
+    active = 0;
+    refresh();
+};
+
+// ------------------------------------------------------------------ recipe buttons
+
+document.getElementById("copy").onclick = async () => {
+    const text = buildJson();
+    try {
+        await navigator.clipboard.writeText(text);
+        toast("JSON скопирован");
+    } catch (err) {
+        jsonEl.select();
+        document.execCommand("copy");
+        toast("JSON скопирован");
+    }
+    refresh();
+};
+
+document.getElementById("download").onclick = () => {
+    const name = (fileNameInput.value || "recipe").trim();
+    const blob = new Blob([buildJson()], { type: "application/json" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = name + ".json";
+    a.click();
+    URL.revokeObjectURL(a.href);
+    toast("Файл " + name + ".json сохранён");
+    refresh();
+};
+
+const fileInput = document.createElement("input");
+fileInput.type = "file";
+fileInput.accept = ".json,application/json";
+fileInput.onchange = () => {
+    const file = fileInput.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => loadJson(String(reader.result), file.name);
+    reader.readAsText(file);
+    fileInput.value = "";
+};
+document.getElementById("loadFile").onclick = () => fileInput.click();
+
+function loadJson(text, fileName) {
+    let obj;
+    try {
+        obj = JSON.parse(text);
+    } catch (err) {
+        toast("Не удалось разобрать JSON");
+        return;
+    }
+
+    if (!obj || !Array.isArray(obj.pattern)) {
+        toast("В JSON нет поля pattern");
+        return;
+    }
+
+    const newLayers = [];
+    for (const layer of obj.pattern) {
+        if (!Array.isArray(layer)) continue;
+        const blank = blankLayer();
+        const height = layer.length;
+        const width = layer.reduce((max, row) => Math.max(max, row.length), 0);
+        const offX = Math.floor((SIZE_X - width) / 2);
+        const offZ = Math.floor((SIZE_Z - height) / 2);
+        for (let z = 0; z < height; z++) {
+            const row = layer[z];
+            for (let x = 0; x < row.length; x++) {
+                const ch = row[x];
+                if (ch === "#" || ch === "X" || ch === "x" || ch === "1") {
+                    const px = offX + x;
+                    const pz = offZ + z;
+                    if (px >= 0 && px < SIZE_X && pz >= 0 && pz < SIZE_Z) blank[pz][px] = METAL;
+                }
+            }
+        }
+        newLayers.push(blank);
+    }
+
+    layers = newLayers.length ? newLayers : [blankLayer()];
+    active = 0;
+
+    if (obj.type === "vintage_firma:clay_forming") {
+        modeSel.value = "clay";
+        applyMode();
+        if (obj.voxels_per_clay !== undefined) perClayInput.value = obj.voxels_per_clay;
+        if (obj.result) {
+            resultInput.value = obj.result.item || "";
+            countInput.value = obj.result.count || 1;
+            ensureOption(clayItemSel, obj.result.item);
+        }
+        ingredientInput.value = "tfc:clay";
+    } else {
+        modeSel.value = "smithing";
+        applyMode();
+        if (obj.metal) ensureOption(metalSel, obj.metal);
+        if (obj.tier !== undefined) tierInput.value = obj.tier;
+        if (obj.pattern_floor !== undefined) floorInput.value = obj.pattern_floor;
+        if (obj.optimal_hits !== undefined) optimalInput.value = obj.optimal_hits;
+        if (obj.ingredient && obj.ingredient.item) ingredientInput.value = obj.ingredient.item;
+        if (obj.result) {
+            resultInput.value = obj.result.item || "";
+            countInput.value = obj.result.count || 1;
+        }
+        // Best-effort: point the item dropdown at the part matching the loaded result id.
+        const part = partFromResult(resultInput.value);
+        if (part) ensureOption(itemSel, part);
+        else if (resultInput.value) {
+            const path = pathFromResult(resultInput.value);
+            if (path) ensureOption(itemSel, path, path + " (свой)");
+        }
+    }
+
+    if (fileName) fileNameInput.value = String(fileName).replace(/\.json$/i, "");
+
+    refresh();
+    toast("Рецепт загружен");
+}
+
+/** "tfc:metal/shovel_head/wrought_iron" -> "metal/shovel_head" */
+function pathFromResult(result) {
+    const m = result.indexOf("tfc:");
+    const body = m === 0 ? result.slice(4) : result;
+    const slash = body.lastIndexOf("/");
+    return slash >= 0 ? body.slice(0, slash) : body;
+}
+
+function partFromResult(result) {
+    const path = pathFromResult(result);
+    for (const part of Object.keys(PARTS)) {
+        if (PARTS[part] === path) return part;
+    }
+    return null;
+}
+
+// ------------------------------------------------------------------ misc
+
+metalSel.addEventListener("change", applyMetal);
+itemSel.addEventListener("change", applyItem);
+modeSel.addEventListener("change", applyMode);
+clayItemSel.addEventListener("change", () => { applyClay(); jsonEl.value = buildJson(); });
+
+["tier", "floor", "optimal", "perClay", "ingredient", "result", "count"].forEach(id => {
+    document.getElementById(id).addEventListener("input", () => { jsonEl.value = buildJson(); });
+});
+
+document.addEventListener("keydown", e => {
+    if (e.key === "Escape") {
+        dragMode = null;
+        dragStart = null;
+    }
+    // Number keys 1..6 switch layer
+    const n = parseInt(e.key, 10);
+    if (!Number.isNaN(n) && n >= 1 && n <= layers.length) {
+        active = n - 1;
+        refresh();
+    }
+});
+
+// ------------------------------------------------------------------ init
+
+fillMetalSelect();
+fillItemSelect();
+fillClayItemSelect();
+applyMode();
+</script>
+</body>
+</html>

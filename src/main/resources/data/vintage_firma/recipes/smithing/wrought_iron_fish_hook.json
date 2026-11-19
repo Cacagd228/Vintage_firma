@@ -1,0 +1,21 @@
+{
+  "type": "vintage_firma:smithing",
+  "ingredient": {
+    "item": "tfc:metal/ingot/wrought_iron"
+  },
+  "metal": "wrought_iron",
+  "tier": 3,
+  "pattern_floor": 0,
+  "pattern": [
+    [
+      "...#",
+      "...#",
+      "...#",
+      "#..#",
+      ".##."
+    ]
+  ],
+  "result": {
+    "item": "tfc:metal/fish_hook/wrought_iron"
+  }
+}

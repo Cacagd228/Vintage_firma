@@ -1,0 +1,12 @@
+{
+  "type": "vintage_firma:clay_forming",
+  "ingredient": { "tag": "tfc:clay" },
+  "pattern": [
+    ["###", "###", "###"],
+    ["#.#", "#.#", "#.#"],
+    ["#.#", "#.#", "#.#"],
+    [".#.", ".#.", ".#."]
+  ],
+  "result": { "item": "tfc:ceramic/unfired_jug" },
+  "voxels_per_clay": 25
+}

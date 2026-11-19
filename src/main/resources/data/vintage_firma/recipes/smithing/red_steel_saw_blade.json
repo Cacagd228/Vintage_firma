@@ -1,0 +1,20 @@
+{
+  "type": "vintage_firma:smithing",
+  "ingredient": {
+    "item": "tfc:metal/ingot/red_steel"
+  },
+  "metal": "red_steel",
+  "tier": 6,
+  "pattern_floor": 0,
+  "pattern": [
+    [
+      "#############",
+      "#############",
+      ".############",
+      "..#.#.#.#.#.#"
+    ]
+  ],
+  "result": {
+    "item": "tfc:metal/saw_blade/red_steel"
+  }
+}
